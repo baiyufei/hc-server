@@ -13,6 +13,7 @@ var http = require('http');
  */
 
 var port = normalizePort(process.env.PORT || '3000');
+
 app.set('port', port);
 
 /**
@@ -20,6 +21,12 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Create socket.io server.
+ */
+var io = require('socket.io')(server);
+require('../routes/WebRTCSignal')(io.of('/WebRTCSignal'));
 
 /**
  * Listen on provided port, on all network interfaces.
