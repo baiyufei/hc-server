@@ -31,6 +31,11 @@ function fcpSignal(io) {
       targetSocket.emit(msg.type , msg);
     });
 
+    socket.on('name-login', function(msg) {
+      logger.info(msg.name);
+      socket.emit('login-answer', {'success':true, 'uid' : 1234});
+    });
+
     socket.on('disconnect', function () {
       delete uidMap[socket.uid];
       logger.info('user ' + socket.uid + ' leaves');
