@@ -26,7 +26,7 @@ var server = http.createServer(app);
  * Create socket.io server.
  */
 var io = require('socket.io')(server);
-require('../routes/WebRTCSignal')(io.of('/WebRTCSignal'));
+require('../routes/fcpSignal')(io.of('/fcpSignal'));
 
 /**
  * Listen on provided port, on all network interfaces.

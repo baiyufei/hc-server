@@ -1,11 +1,11 @@
 /**
  * Created by baiyu on 2016/11/14.
  */
-var logger = require('log4js').getLogger('WebRTCSignal');
+var logger = require('log4js').getLogger('fcpSignal');
 
 var uidMap = {};    // uid -- socket
 
-function WebRTCSignal(io) {
+function fcpSignal(io) {
   io.on('connection', function(socket) {
     logger.info('a device connected');
 
@@ -26,6 +26,8 @@ function WebRTCSignal(io) {
         return;
       }
       var targetSocket = uidMap[uid];
+      if (msg.candidate) {
+      }
       targetSocket.emit(msg.type , msg);
     });
 
@@ -33,7 +35,8 @@ function WebRTCSignal(io) {
       delete uidMap[socket.uid];
       logger.info('user ' + socket.uid + ' leaves');
     });
+
   });
 }
 
-module.exports = WebRTCSignal;
+module.exports = fcpSignal;
