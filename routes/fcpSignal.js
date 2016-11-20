@@ -5,8 +5,24 @@ var logger = require('log4js').getLogger('fcpSignal');
 
 var uidMap = {};    // uid -- socket
 
+var con = require('mysql').createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : require('./key'),
+  database : 'openfire'
+});
+
+con.connect(function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+
+  console.log('connected as id ' + con.threadId);
+});
+
 function fcpSignal(io) {
-  io.on('connection', function(socket) {
+  io.on('con', function(socket) {
     logger.info('a device connected');
 
     socket.on('join', function (msg) {
