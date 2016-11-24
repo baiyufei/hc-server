@@ -22,7 +22,7 @@ con.connect(function(err) {
 });
 
 function fcpSignal(io) {
-  io.on('con', function(socket) {
+  io.on('connection', function(socket) {
     logger.info('a device connected');
 
     socket.on('join', function (msg) {
@@ -48,8 +48,58 @@ function fcpSignal(io) {
     });
 
     socket.on('name-login', function(msg) {
-      logger.info(msg.name);
-      socket.emit('login-answer', {'success':true, 'uid' : 1234});
+      con.query('SELECT userid FROM msuserattr WHERE username =  ?', [msg.name],
+        function(err, rows) {
+          if (err) throw err;
+
+          if (rows[0] === undefined || rows[0].userid === undefined) {
+            socket.emit('login-answer', {'success':false, 'reason' : 'no name'});
+          }
+          else if (uidMap[rows[0].userid] !== undefined) {
+            socket.emit('login-answer', {'success':false, 'reason' : 'duplicate'});
+          }
+          else {
+            socket.emit('login-answer', {'success':true, 'uid' : rows[0].userid});
+            uidMap[rows[0].userid] = socket;
+            socket.uid = rows[0].userid;
+
+            logger.info("user " + rows[0].userid + " log in");
+          }
+        });
+    });
+
+    socket.on('aid-login', function(msg) {
+      con.query('SELECT username FROM mshat JOIN mshatuser ON mshat.hid = mshatuser.hid WHERE androidid = ?',
+        [msg.aid],
+        function(err, rows) {
+          if (err) throw err;
+
+          if (rows[0] === undefined) {
+            socket.emit('login-answer', {'success':false, 'reason' : 'no name'});
+            logger.warn('unknown android device which aid == ' + msg.aid +', we should add it to database');
+          }
+          else if (rows[0].username === "") {
+            socket.emit('login-answer', {'success':false, 'reason' : 'no verification'});
+          }
+          else {
+            var uid = rows[0].username; // a little confused, the username in table actually is uid
+
+            uidMap[uid] = socket;
+            socket.uid = uid;
+            socket.emit('login-answer', {'success':true, 'uid' : uid});
+
+            var clientIp = socket.request.connection.remoteAddress;
+
+            con.query('UPDATE mshat SET ip = ? WHERE androidid = ?;', [clientIp, msg.aid],
+              function(err) { if (err) throw err;});
+
+            con.query('SELECT username FROM msuserattr WHERE userid = ?', [uid],
+              function(err, rows) {
+                if (err) throw err;
+                logger.info(rows[0].username + " now is using Hat " + msg.aid);
+              });
+          }
+        });
     });
 
     socket.on('disconnect', function () {

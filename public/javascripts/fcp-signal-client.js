@@ -2,15 +2,16 @@ function fcpSignalClient(address) {
   var ioClient = io.connect(address + '/fcpSignal');
   var sound = fcpSound();
   var rtc;
+  var aid;
 
   var State = {
-    OFF_LINE: 0,
-    NOT_JOINED: 1,
-    USUAL:    2,
-    CALL_WAIT: 3,
-    CALL_RING: 4,
+    OFF_LINE:       0,
+    NOT_JOINED:     1,
+    USUAL:          2,
+    CALL_WAIT:      3,
+    CALL_RING:      4,
     CALL_CONNECTED: 5,
-    CALL_GROUP: 6
+    CALL_GROUP:     6
   };
 
   var uid;        // local client uid
@@ -30,7 +31,7 @@ function fcpSignalClient(address) {
       else if (msg.reason === "duplicate") {
         sound.play('duplication');
       }
-      else if (msg.reason === "'no verification") {
+      else if (msg.reason === "no verification") {
         sound.play('no-card');
       }
     }
@@ -40,6 +41,16 @@ function fcpSignalClient(address) {
 
   that.nameLogin = function(name) {
     ioClient.emit('name-login', {'name': name});
+  };
+
+  that.setAid = function(_aid) {
+    aid = _aid;
+  };
+
+  that.aidLogin = function() {
+    if (aid === undefined) return;
+
+    ioClient.emit('aid-login', {'aid': aid});
   };
 
   return that;
