@@ -102,6 +102,69 @@ function fcpSignal(io) {
         });
     });
 
+    socket.on('call', function(msg) {
+      if (msg.index !== undefined) {
+        var index = msg.index;
+        if (!Number.isInteger(index) || index > 3 || index < 1){
+          socket.emit('call-answer', {'success': false});
+          return;
+        }
+        var uid = msg.from;
+        if (uidMap[uid] === undefined) {
+          // should never be here
+          // we haven't record the uid, but it send a call signal. Perhaps we should send a reset signal
+          return;
+        }
+        var contact = 'contact' + index;
+        var queryString = 'SELECT ' + contact +' from msuserattr where userid = ?';
+        con.query(queryString, [uid],
+          function(err, rows) {
+            if (err) throw err;
+            if (rows[0][contact] === undefined) {
+              socket.emit('call-answer', {'success': false, reason: 'off line'});
+              return;
+            }
+            var to = rows[0][contact];
+            call(uid, to);
+          });
+      }
+      else if (msg.to !== undefined) {
+        call(msg.from, msg.to);
+      }
+    });
+
+    function call(from, to) {
+      logger.info('user ' + from + ' is calling ' + to);
+      var socketFrom = uidMap[from];
+      var socketTo = uidMap[to];
+      if (socketFrom === undefined)
+        return;
+
+      if (socketTo === undefined) {
+        socketFrom.emit('call-answer', {'success': false, reason: 'off line'});
+        return;
+      }
+
+      socketFrom.emit('call-answer', {'success': true, 'from' : to});
+      socketTo.emit('call', {'from': from, 'to': to});
+    }
+
+    function transmit(msg, name) {
+      var socketFrom = uidMap[msg.from];
+      var socketTo = uidMap[msg.to];
+      if (socketTo !== undefined && socketFrom !== undefined ) {
+        socketTo.emit(name, msg);
+      }
+    }
+
+    socket.on('reply', function(msg) {
+      transmit(msg, 'reply');
+    });
+
+    socket.on('hang-up', function(msg) {
+      transmit(msg, 'hang-up');
+    });
+
     socket.on('disconnect', function () {
       delete uidMap[socket.uid];
       logger.info('user ' + socket.uid + ' leaves');

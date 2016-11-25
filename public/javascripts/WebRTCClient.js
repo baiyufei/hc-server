@@ -34,7 +34,7 @@ function webRTCClient(ioWebRTC) {
   var that = {
     setLocalUid: function(_uid) {
       uid = _uid;
-      ioWebRTC.emit('join', {"uid": uid});
+      // ioWebRTC.emit('join', {"uid": uid});
     },
     call: function(target) {
       if (pcList.length !== 0) {
