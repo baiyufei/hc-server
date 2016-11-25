@@ -141,6 +141,41 @@ function fcpSignalClient(address) {
     }
   };
 
+  /** helmet operation **/
+
+  that.buttonClick = function(index) {
+    // index should be 1 ~ 3
+    switch (state) {
+      case State.USUAL:
+        that.callIndex(index);
+        break;
+      case State.CALL_WAIT:
+        that.hangup();
+        break;
+      case State.CALL_RING:
+        if (index < 3) {
+          that.accept();
+        } else {
+          that.refuse();
+        }
+        break;
+      case State.CALL_CONNECTED:
+        that.hangup();
+        break;
+      case  State.NOT_JOINED:
+        that.aidLogin();
+        break;
+    }
+  };
+
+  that.buttonLongPress = function() {
+
+  };
+
+  that.buttonLongUp = function() {
+
+  };
+
 
 
   return that;
