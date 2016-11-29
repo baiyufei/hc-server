@@ -168,11 +168,11 @@ function fcpSignalClient(address) {
     }
   };
 
-  that.buttonLongPress = function() {
+  that.buttonLongPress = function(index) {
 
   };
 
-  that.buttonLongUp = function() {
+  that.buttonLongUp = function(index) {
 
   };
 
