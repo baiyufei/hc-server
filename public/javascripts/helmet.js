@@ -38,7 +38,7 @@ function keyUp(e) {
     var index = keycode - 111;
     if (keyCount > 4) {
 
-        user.buttonLongUp(index);
+        user.buttonLongUp();
         Android.showToast(index + " long press end")
     }
     else {

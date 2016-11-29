@@ -11,11 +11,13 @@ function fcpSignalClient(address) {
     CALL_WAIT:      3,
     CALL_RING:      4,
     CALL_CONNECTED: 5,
-    CALL_GROUP:     6
+    CALL_GROUP_CALL:6,
+    CALL_GROUP_CALLEE: 7
   };
 
   var uid;        // local client uid
   var remoteUid;
+  var gUidList = [];   // group call uid list
   var state = State.OFF_LINE;
 
   ioClient.on('login-answer', function(msg) {
@@ -62,6 +64,7 @@ function fcpSignalClient(address) {
     sound.play('ring');
   });
 
+
   ioClient.on('reply', function(msg) {
     if (state !== State.CALL_WAIT) return;
     if (msg.result === "busy") {
@@ -86,6 +89,30 @@ function fcpSignalClient(address) {
       sound.stop();
       state = State.USUAL;
     }
+  });
+
+  ioClient.on('group-call', function(msg) {
+    if (state !== State.USUAL)
+      return;
+    ioClient.emit('group-call-answer', {'from': uid, 'to': msg.from, 'success': true});
+    remoteUid = msg.from;
+    state = State.CALL_GROUP_CALLEE;
+  });
+
+  ioClient.on('group-call-answer', function(msg) {
+    if (state !== State.CALL_GROUP_CALL) {
+      return;
+    }
+    gUidList.push(msg.from);
+    rtc.groupCallSingle(msg.from);
+  });
+
+  ioClient.on('group-call-hang-up', function(msg) {
+    if (state !== State.CALL_GROUP_CALLEE) {
+      return;
+    }
+    rtc.hangup();
+    state = State.USUAL;
   });
 
   var that = {};
@@ -132,12 +159,32 @@ function fcpSignalClient(address) {
     ioClient.emit('reply', {'result': 'refuse', 'from': uid, 'to': remoteUid});
   };
 
+  that.groupCall = function(index) {
+    // index should be 1 ~ 3
+
+    if (state !== State.USUAL)
+      return;
+    state = State.CALL_GROUP_CALL;
+    ioClient.emit('group-call', {'from': uid, 'index': index});
+  };
+
   that.hangup = function() {
     if (state === State.CALL_WAIT || state === State.CALL_CONNECTED) {
       rtc.hangup();
       sound.stop();
       state = State.USUAL;
       ioClient.emit('hang-up', {'from': uid, 'to': remoteUid});
+    }
+    else if (state === State.CALL_GROUP_CALL) {
+      rtc.hangup();
+
+      for (var i = 0; i < gUidList.length; i++) {
+        var to = gUidList[i];
+        ioClient.emit('group-call-hang-up', {'from': uid, 'to': to});
+      }
+      gUidList = [];
+
+      state = State.USUAL;
     }
   };
 
@@ -169,14 +216,18 @@ function fcpSignalClient(address) {
   };
 
   that.buttonLongPress = function(index) {
-
+    switch (state) {
+      case State.USUAL:
+        that.groupCall(index);
+    }
   };
 
-  that.buttonLongUp = function(index) {
-
+  that.buttonLongUp = function() {
+    switch (state) {
+      case State.CALL_GROUP_CALL:
+        that.hangup();
+    }
   };
-
-
 
   return that;
 }

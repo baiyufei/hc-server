@@ -57,6 +57,10 @@ function webRTCClient(ioWebRTC) {
         rtcStart(target);
       }
     },
+    groupCallSingle: function(target) {
+      mode = 'group';
+      rtcStart(target);
+    },
     hangup: function() {
       trace('Ending call');
       // because only get recorder once, so here don't close the recorder.

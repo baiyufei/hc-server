@@ -157,6 +157,32 @@ function fcpSignal(io) {
       }
     }
 
+    socket.on('group-call', function(msg) {
+      var index = msg.index;
+      var queryString = "SELECT userid FROM msroomuser WHERE chatroomid = (select chatroom"+
+        index.toString()+" FROM msuserattr WHERE userid = '"+msg.from+"');";
+      con.query(queryString, function(err, rows) {
+        if (err) throw err;
+
+        for (var i = 0; i < rows.length; i++) {
+          var tUid = rows[i].userid;
+          var tSocket = uidMap[tUid];
+          if (tSocket !== undefined) {
+            tSocket.emit("group-call", {'from': msg.from})
+          }
+        }
+
+      });
+    });
+
+    socket.on('group-call-hang-up', function(msg) {
+      transmit(msg, 'group-call-hang-up');
+    });
+
+    socket.on('group-call-answer', function(msg) {
+      transmit(msg, 'group-call-answer');
+    });
+
     socket.on('reply', function(msg) {
       transmit(msg, 'reply');
     });
