@@ -28,6 +28,9 @@ function fcpSignalClient(address) {
       rtc.setLocalUid(uid);
       sound.play('login-success');
       console.log("login success! Uid is " + uid);
+      if (eventCallback !== undefined) {
+        eventCallback.loginSuccess();
+      }
     } else {
       state = State.NOT_JOINED;
       if (msg.reason === "no name") {
@@ -49,6 +52,10 @@ function fcpSignalClient(address) {
       state = State.CALL_WAIT;
       remoteUid = msg.from;
       sound.play('wait');
+      if (eventCallback !== undefined) {
+        eventCallback.callSuccess(msg.from);
+      }
+
     } else {
       sound.play('offline');
     }
@@ -228,6 +235,35 @@ function fcpSignalClient(address) {
         that.hangup();
     }
   };
+
+  /** panel operation */
+
+  /**
+   * online get offline users, then we can choose one to login
+   */
+  that.getUserList = function() {
+    ioClient.emit('panel', {type: 'valid-user-list'});
+  };
+
+  var dataCallback;
+  that.setDataCallback = function(_dCb) {
+    dataCallback = _dCb;
+  };
+
+
+  var eventCallback;
+  that.setEventCallback = function(_eCb) {
+    eventCallback = _eCb;
+  };
+
+
+
+  ioClient.on("panel", function(msg) {
+    if (msg.type === "valid-user-list") {
+      dataCallback(msg.type, msg.data);
+    }
+    dataCallback(msg.type, msg.data);
+  });
 
   return that;
 }

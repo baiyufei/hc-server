@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="stylesheets/panel.css" rel="stylesheet">
+</head>
+<body>
+
+<div><audio id="audio" autoplay controls></audio></div>
+
+<div v-if="seen" id="loginList">
+  <select v-model="selected" title = "登录名单">
+  <option v-for="name in names" :value="name">{{ name }}</option>
+  </select>
+  <button @click="login">log in</button>
+</div>
+
+<div id="contact">
+  <user v-for="item in users" :user="item"></user>
+</div>
+
+<div id="groups">
+  <group v-for="group in groups" :group="group"></group>
+</div>
+
+
+<div id="call">
+  <h2>主叫面板</h2>
+  <p> 正在呼叫 {{ target }} </p>
+  <button @click="hangup">挂断</button>
+</div>
+
+<div id="callee">
+  <h2>被叫面板</h2>
+  <button @click="accept">接听</button>
+  <button @click="refuse">拒绝</button>
+</div>
+
+<div id="talk">
+  <h2>通话面板</h2>
+  <button @click="hangup">结束通话</button>
+</div>
+
+
+
+<script src="javascripts/socket.io.js"></script>
+<script src="javascripts/adapter.js"></script>
+<script src="javascripts/WebRTCClient.js"></script>
+<script src="javascripts/fcp-sound.js"></script>
+<script src="javascripts/fcp-signal-client.js"></script>
+<script src="javascripts/vue.js"></script>
+<script src="javascripts/panel.js"></script>
+</body>
+</html>

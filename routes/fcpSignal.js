@@ -63,10 +63,32 @@ function fcpSignal(io) {
             uidMap[rows[0].userid] = socket;
             socket.uid = rows[0].userid;
 
+            socket.join('panels');
             logger.info("user " + rows[0].userid + " log in");
+            updatePanel();
           }
         });
     });
+
+
+    function updatePanel() {
+      con.query('SELECT userid, username, orgname FROM msuserattr;',
+        function(err, rows) {
+          if (err) throw err;
+          var ret = [];
+          for (var i = 0; i < rows.length; i++) {
+            var item = {};
+            item.uid = rows[i].userid;
+            item.online = (!(uidMap[item.uid] === undefined));
+            item.name = rows[i].username;
+            item.org = rows[i].orgname;
+            ret.push(item);
+          }
+          io.to('panels').emit('panel', {type: 'contacts', data: ret});
+        });
+
+    }
+
 
     socket.on('aid-login', function(msg) {
       con.query('SELECT username FROM mshat JOIN mshatuser ON mshat.hid = mshatuser.hid WHERE androidid = ?',
@@ -87,6 +109,7 @@ function fcpSignal(io) {
             uidMap[uid] = socket;
             socket.uid = uid;
             socket.emit('login-answer', {'success':true, 'uid' : uid});
+            updatePanel();
 
             var clientIp = socket.request.connection.remoteAddress;
 
@@ -189,6 +212,24 @@ function fcpSignal(io) {
 
     socket.on('hang-up', function(msg) {
       transmit(msg, 'hang-up');
+    });
+
+
+    socket.on('panel', function(msg) {
+      if (msg.type === "valid-user-list") {
+        con.query('SELECT userid, username FROM msuserattr;',
+          function(err, rows) {
+            if (err) throw err;
+            var ret = [];
+            for (var i = 0 ; i < rows.length; i++) {
+              var uid = rows[i].userid;
+              if (uidMap[uid] === undefined) {
+                ret.push(rows[i].username);
+              }
+            }
+            socket.emit('panel', {type: "valid-user-list", data: ret});
+          });
+      }
     });
 
     socket.on('disconnect', function () {
