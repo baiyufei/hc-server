@@ -178,12 +178,13 @@ function fcpSignalClient(address) {
   that.hangup = function() {
     if (state === State.CALL_WAIT || state === State.CALL_CONNECTED) {
       rtc.hangup();
-      sound.stop();
+      sound.play("hangup");
       state = State.USUAL;
       ioClient.emit('hang-up', {'from': uid, 'to': remoteUid});
     }
     else if (state === State.CALL_GROUP_CALL) {
       rtc.hangup();
+      sound.play("hangup");
 
       for (var i = 0; i < gUidList.length; i++) {
         var to = gUidList[i];
