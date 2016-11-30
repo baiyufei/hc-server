@@ -18,7 +18,7 @@ function panelGenerator() {
 
   Vue.component('user', {
     props: ['user'],
-    template: '<div :class="{online: user.online ,offline: !user.online}">{{ user.name }} {{ user.org }} <button @click="call">call</button></div> ',
+    template: '<div :class="{online: user.online ,offline: !user.online}">{{ user.name }} {{ user.org }} <a @click="call" class="waves-effect waves-light btn green lighten-1">call</a></div> ',
     methods: {
       call: function() {
         _fcpClient.callUid(this.user.uid);

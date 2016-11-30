@@ -4,47 +4,62 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="materialize/css/materialize.css"  rel="stylesheet"/>
   <link href="stylesheets/panel.css" rel="stylesheet">
 </head>
 <body>
 
+<div class="row">
+  <div class="col s2" id="loginList">
+    <select v-model="selected" title = "登录名单" class="">
+      <option v-for="name in names" :value="name">{{ name }}</option>
+    </select>
+    <button @click="login">log in</button>
+  </div>
+
+  <div id="contact" class="col s3">
+    <div class>
+      <user v-for="item in users" :user="item" class="row"></user>
+    </div>
+  </div>
+
+  <div id="groups" class="col s7">
+    <group v-for="group in groups" :group="group"></group>
+  </div>
+
+  <!--<div id="callee" class="panel panel-primary">-->
+    <!--<div class="panel-body ">-->
+      <!--<h2>被叫面板</h2>-->
+      <!--<button @click="accept" class="btn btn-success">接听</button>-->
+      <!--<button @click="refuse" class="btn btn-danger">拒绝</button>-->
+    <!--</div>-->
+  <!--</div>-->
+
+  <!--<div id="talk" class="panel panel-primary">-->
+    <!--<div class="panel-body">-->
+      <!--<h2>通话面板</h2>-->
+      <!--<button @click="hangup" class="btn btn-danger ">结束通话</button>-->
+    <!--</div>-->
+  <!--</div>-->
+
+
+
+  <!--<div id="call" class="panel panel-primary vertical-center">-->
+    <!--<div class="panel-body">-->
+      <!--<h2>主叫面板</h2>-->
+      <!--<p> 正在呼叫 {{ target }} </p>-->
+      <!--<button @click="hangup" class="btn btn-danger center-block">挂断</button>-->
+    <!--</div>-->
+  <!--</div>-->
+</div>
+
 <div><audio id="audio" autoplay controls></audio></div>
 
-<div v-if="seen" id="loginList">
-  <select v-model="selected" title = "登录名单">
-  <option v-for="name in names" :value="name">{{ name }}</option>
-  </select>
-  <button @click="login">log in</button>
-</div>
-
-<div id="contact">
-  <user v-for="item in users" :user="item"></user>
-</div>
-
-<div id="groups">
-  <group v-for="group in groups" :group="group"></group>
-</div>
 
 
-<div id="call">
-  <h2>主叫面板</h2>
-  <p> 正在呼叫 {{ target }} </p>
-  <button @click="hangup">挂断</button>
-</div>
-
-<div id="callee">
-  <h2>被叫面板</h2>
-  <button @click="accept">接听</button>
-  <button @click="refuse">拒绝</button>
-</div>
-
-<div id="talk">
-  <h2>通话面板</h2>
-  <button @click="hangup">结束通话</button>
-</div>
-
-
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="materialize/js/materialize.min.js"></script>
 
 <script src="javascripts/socket.io.js"></script>
 <script src="javascripts/adapter.js"></script>
