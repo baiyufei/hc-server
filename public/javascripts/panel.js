@@ -50,7 +50,12 @@ function panelGenerator() {
 
   Vue.component('group', {
     props: ['group'],
-    template: '<div> {{ group.name }} {{ group.owner }} <div v-for="uid in group.users">{{uid}}</div></div>'
+    template: '<div> {{ group.name }} {{ group.owner }} <div v-for="user in group.member">{{user.name}}</div><a @click="groupCall" class="waves-effect waves-light btn green">群组语音</a></div>',
+    methods: {
+      groupCall : function() {
+        _fcpClient.groupCallId(this.group.id);
+      }
+    }
   });
 
   Vue.component('loginItem', {
@@ -85,17 +90,7 @@ function panelGenerator() {
 
   var groups = new Vue({
     el: '#groups',
-    data: {
-      groups: [{
-        name: "小组1",
-        owner: "小白",
-        users: ["100001", "100002"]
-      }, {
-        name: "小组2",
-        owner: "小黑",
-        users: ["100003", "100002"]
-      }]
-    }
+    data: {groups: []}
   });
 
 
@@ -113,7 +108,7 @@ function panelGenerator() {
       }
     }
     else if (type ==="group-info") {
-      alert("11");
+      groups.groups = data;
     }
   }
 

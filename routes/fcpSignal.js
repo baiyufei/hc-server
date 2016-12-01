@@ -225,6 +225,21 @@ function fcpSignal(io) {
       });
     });
 
+    socket.on('group-call-id', function(msg) {
+      logger.trace(msg);
+      var id = msg.id;
+      con.query('SELECT userid FROM msroomuser WHERE chatroomid = ?', id, function(err, rows) {
+        if (err) throw err;
+        for (var i = 0; i < rows.length; i++) {
+          var tUid = rows[i].userid;
+          var tSocket = uidMap[tUid];
+          if (tSocket !== undefined) {
+            tSocket.emit("group-call", {'from': msg.from})
+          }
+        }
+      });
+    });
+
     socket.on('group-call-hang-up', function(msg) {
       transmit(msg, 'group-call-hang-up');
     });

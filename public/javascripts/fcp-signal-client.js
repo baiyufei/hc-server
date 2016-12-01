@@ -181,6 +181,14 @@ function fcpSignalClient(address) {
     ioClient.emit('group-call', {'from': uid, 'index': index});
   };
 
+  // group call by using target group id
+  that.groupCallId = function(id) {
+    if (state !== State.USUAL)
+      return;
+    state = State.CALL_GROUP_CALL;
+    ioClient.emit('group-call-id', {'from': uid, 'id': id});
+  };
+
   that.hangup = function() {
     if (state === State.CALL_WAIT || state === State.CALL_CONNECTED) {
       rtc.hangup();
