@@ -87,6 +87,33 @@ function fcpSignal(io) {
           io.to('panels').emit('panel', {type: 'contacts', data: ret});
         });
 
+      con.query('SELECT chatroomid, roomname, owner from mschatroom', function(err, rows) {
+        if (err) throw err;
+        var ret = [];
+        var idMap = {};
+        for (var i = 0; i < rows.length; i++) {
+          var group = {};
+          group.name = rows[i].roomname;
+          group.id = rows[i].chatroomid;
+          group.owner = rows[i].owner;
+          group.member = [];
+          ret.push(group);
+          idMap[group.id] = group;
+        }
+
+        con.query('SELECT * from msroomuser', function(err, rows) {
+          if (err) throw err;
+          for (var i = 0; i < rows.length; i++) {
+            var user = {};
+            user.name = rows[i].username;
+            user.id = rows[i].userid;
+            user.online = (uidMap[user.id] !== undefined);
+            var gid = rows[i].chatroomid;
+            idMap[gid].member.push(user);
+          }
+          socket.emit('panel', {type: "group-info", data: ret});
+        })
+      })
     }
 
 

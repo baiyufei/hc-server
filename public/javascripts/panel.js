@@ -8,9 +8,31 @@ function panelGenerator() {
   var eventCallback = {
     callSuccess: function(uid) {
       call.target = _users[uid].name;
+      call.seen = true;
+    },
+    accept: function() {
+      call.seen = false;
+      talk.seen = true;
+    },
+    end: function() {
+      talk.seen = false;
+      call.seen = false;
+      callee.seen = false;
+    },
+    calleeAccept: function() {
+      callee.seen = false;
+      talk.seen = true;
+    },
+    calleeRefuse: function() {
+      callee.seen =false;
+    },
+    call: function() {
+      callee.seen = true;
     },
     loginSuccess: function() {
       loginList.seen = false;
+      loginInfo.seen = true;
+      chooseInfo.seen = false;
     }
   };
 
@@ -18,7 +40,7 @@ function panelGenerator() {
 
   Vue.component('user', {
     props: ['user'],
-    template: '<div :class="{online: user.online ,offline: !user.online}">{{ user.name }} {{ user.org }} <a @click="call" class="waves-effect waves-light btn green lighten-1">call</a></div> ',
+    template: '<div class="row"><div class="col s12"><div class="card-panel hoverable grey"><div class="row"><div class="col s8"><div>{{ user.name }}</div><div>{{ user.org }}</div></div><div class="col s4"><a @click="call" class="waves-effect waves-light btn green">call</a></div></div> </div></div></div> ',
     methods: {
       call: function() {
         _fcpClient.callUid(this.user.uid);
@@ -31,18 +53,33 @@ function panelGenerator() {
     template: '<div> {{ group.name }} {{ group.owner }} <div v-for="uid in group.users">{{uid}}</div></div>'
   });
 
+  Vue.component('loginItem', {
+    props: ['name'],
+    template: '<li @click="login"><a> {{ name }}</a></li>',
+    methods: { login: function() {
+      _fcpClient.nameLogin(this.name);
+      loginInfo.name = this.name;
+    }}
+  });
+
+  var chooseInfo = new Vue({
+    el: '#choose',
+    data: {seen: true}
+  });
 
   var loginList = new Vue({
     el: '#loginList',
     data: {
       names: [],
-      selected: 0,
       seen: true
-    },
-    methods: {
-      login: function() {
-        _fcpClient.nameLogin(this.selected);
-      }
+    }
+  });
+
+  var loginInfo = new Vue({
+    el: '#loginInfo',
+    data: {
+      seen: false,
+      name: ""
     }
   });
 
@@ -75,6 +112,9 @@ function panelGenerator() {
         _users[data[i].uid] = data[i];
       }
     }
+    else if (type ==="group-info") {
+      alert("11");
+    }
   }
 
 
@@ -91,7 +131,8 @@ function panelGenerator() {
   var call = new Vue({
     el: '#call',
     data: {
-      target: {}
+      target: {},
+      seen: false
     },
     methods: {
       hangup: function() { _fcpClient.hangup(); }
@@ -101,7 +142,8 @@ function panelGenerator() {
   var callee = new Vue({
     el: '#callee',
     data: {
-      target: {}
+      target: {},
+      seen: false
     },
     methods: {
       accept: function() {
@@ -114,7 +156,8 @@ function panelGenerator() {
   var talk = new Vue({
     el: '#talk',
     data: {
-      target: {}
+      target: {},
+      seen: false
     },
     methods: {
       hangup: function() { _fcpClient.hangup();}

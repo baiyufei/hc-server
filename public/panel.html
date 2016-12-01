@@ -10,17 +10,23 @@
 </head>
 <body>
 
+<main>
 <div class="row">
-  <div class="col s2" id="loginList">
-    <select v-model="selected" title = "登录名单" class="">
-      <option v-for="name in names" :value="name">{{ name }}</option>
-    </select>
-    <button @click="login">log in</button>
+  <div class="col s2">
+    <a v-if="seen" class='dropdown-button btn' href='#' data-activates='loginList'id="choose">请选择登录人员</a>
+    <ul v-if="seen" class="dropdown-content" id="loginList">
+      <login-item v-for="name in names" :name="name"></login-item>
+    </ul>
+
+    <div id = "loginInfo" v-if="seen">
+      <p>当前登录的用户是</p>
+      <p> {{ name }}</p>
+    </div>
   </div>
 
   <div id="contact" class="col s3">
     <div class>
-      <user v-for="item in users" :user="item" class="row"></user>
+      <user v-for="item in users" :user="item"></user>
     </div>
   </div>
 
@@ -28,37 +34,34 @@
     <group v-for="group in groups" :group="group"></group>
   </div>
 
-  <!--<div id="callee" class="panel panel-primary">-->
-    <!--<div class="panel-body ">-->
-      <!--<h2>被叫面板</h2>-->
-      <!--<button @click="accept" class="btn btn-success">接听</button>-->
-      <!--<button @click="refuse" class="btn btn-danger">拒绝</button>-->
-    <!--</div>-->
-  <!--</div>-->
+  <div v-if="seen" id="callee" class="card-panel vertical-center">
 
-  <!--<div id="talk" class="panel panel-primary">-->
-    <!--<div class="panel-body">-->
-      <!--<h2>通话面板</h2>-->
-      <!--<button @click="hangup" class="btn btn-danger ">结束通话</button>-->
-    <!--</div>-->
-  <!--</div>-->
+      <h2>被叫面板</h2>
+      <a @click="accept" class="waves-effect waves-light btn green">接听</a>
+      <a @click="refuse" class="waves-effect waves-light btn red">拒绝</a>
 
+  </div>
 
+  <div v-if="seen" id="talk" class="card-panel vertical-center">
+      <h2>通话面板</h2>
+      <a @click="hangup" class="waves-effect waves-light btn red">结束通话</a>
+  </div>
 
-  <!--<div id="call" class="panel panel-primary vertical-center">-->
-    <!--<div class="panel-body">-->
-      <!--<h2>主叫面板</h2>-->
-      <!--<p> 正在呼叫 {{ target }} </p>-->
-      <!--<button @click="hangup" class="btn btn-danger center-block">挂断</button>-->
-    <!--</div>-->
-  <!--</div>-->
+  <div v-if="seen" id="call" class="card-panel vertical-center">
+      <h2>主叫面板</h2>
+      <p> 正在呼叫 {{ target }} </p>
+    <a @click="hangup" class="waves-effect waves-light btn red">挂断</a>
+  </div>
 </div>
-
-<div><audio id="audio" autoplay controls></audio></div>
-
+</main>
 
 
-<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<div><audio id="audio" autoplay></audio></div>
+
+
+
+<!--<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
+<script type="text/javascript" src="javascripts/jquery.min.js"></script>
 <script type="text/javascript" src="materialize/js/materialize.min.js"></script>
 
 <script src="javascripts/socket.io.js"></script>

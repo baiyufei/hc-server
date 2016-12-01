@@ -69,6 +69,7 @@ function fcpSignalClient(address) {
     remoteUid = msg.from;
     state = State.CALL_RING;
     sound.play('ring');
+    if (eventCallback !== undefined) eventCallback.call();
   });
 
 
@@ -81,12 +82,14 @@ function fcpSignalClient(address) {
     else if (msg.result === "refuse") {
       state = State.USUAL;
       sound.play('refuse');
+      if (eventCallback !== undefined) eventCallback.end();
     }
     else if (msg.result === "accept") {
       sound.stop();
       state = State.CALL_CONNECTED;
       remoteUid = msg.from;
       rtc.call(msg.from);
+      if (eventCallback !== undefined) eventCallback.accept();
     }
   });
 
@@ -95,6 +98,7 @@ function fcpSignalClient(address) {
       rtc.hangup();
       sound.stop();
       state = State.USUAL;
+      if (eventCallback !== undefined) eventCallback.end();
     }
   });
 
@@ -157,6 +161,7 @@ function fcpSignalClient(address) {
     state = State.CALL_CONNECTED;
     sound.stop();
     ioClient.emit('reply', {'result': 'accept', 'from': uid, 'to': remoteUid});
+    if (eventCallback !== undefined) eventCallback.calleeAccept();
   };
 
   that.refuse = function() {
@@ -164,6 +169,7 @@ function fcpSignalClient(address) {
     state = State.USUAL;
     sound.stop();
     ioClient.emit('reply', {'result': 'refuse', 'from': uid, 'to': remoteUid});
+    if (eventCallback !== undefined) eventCallback.calleeRefuse();
   };
 
   that.groupCall = function(index) {
@@ -181,6 +187,7 @@ function fcpSignalClient(address) {
       sound.play("hangup");
       state = State.USUAL;
       ioClient.emit('hang-up', {'from': uid, 'to': remoteUid});
+      if (eventCallback !== undefined) eventCallback.end();
     }
     else if (state === State.CALL_GROUP_CALL) {
       rtc.hangup();
@@ -244,6 +251,7 @@ function fcpSignalClient(address) {
    */
   that.getUserList = function() {
     ioClient.emit('panel', {type: 'valid-user-list'});
+
   };
 
   var dataCallback;
