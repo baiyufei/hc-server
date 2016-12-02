@@ -101,7 +101,8 @@ function fcpSignal(io) {
           idMap[group.id] = group;
         }
 
-        con.query('SELECT * from msroomuser', function(err, rows) {
+        con.query('SELECT msroomuser.chatroomid,msroomuser.userid,msuserattr.username ' +
+          'FROM msroomuser JOIN msuserattr on msroomuser.userid = msuserattr.userid', function(err, rows) {
           if (err) throw err;
           for (var i = 0; i < rows.length; i++) {
             var user = {};

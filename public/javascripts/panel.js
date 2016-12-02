@@ -183,6 +183,7 @@ function panelGenerator() {
     }
   });
 
+  // the card pop-up when talking
   var talk = new Vue({
     el: '#talk',
     data: {
@@ -194,6 +195,7 @@ function panelGenerator() {
     }
   });
 
+  // the card pop-up when start a group call
   var groupCall = new Vue({
     el: '#groupCall',
     data: {
@@ -210,6 +212,7 @@ function panelGenerator() {
     }
   });
 
+  // the card pop-up when receive a group call
   var groupCallee = new Vue({
     el: '#groupCallee',
     data: {
