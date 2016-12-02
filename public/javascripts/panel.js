@@ -114,7 +114,10 @@ function panelGenerator() {
 
   var groups = new Vue({
     el: '#groups',
-    data: {groups: []}
+    data: {
+      groups: [],
+      seen: true
+    }
   });
 
 
@@ -151,7 +154,8 @@ function panelGenerator() {
     el: '#contact',
     data: {
       users: [
-      ]
+      ],
+      seen: true
     }
   });
 
@@ -231,9 +235,25 @@ function panelGenerator() {
 
   _fcpClient.getUserList();
 
+
+  function show(seen) {
+    loginInfo.seen = seen[0];
+    contact.seen = seen[1];
+    groups.seen = seen[2];
+  }
+
+  // used for Tab
+  that.showLoginInfo = function() {
+    show([true, false, false]);
+  };
+  that.showContact = function() {
+    show([false, true, false]);
+  };
+  that.showGroup = function() {
+    show([false, false, true]);
+  };
+
   return that;
 }
 
 var panel = panelGenerator();
-
-

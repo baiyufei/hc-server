@@ -11,13 +11,12 @@
 <body>
 
 <main>
-  <div class="row" id = "back">
-    <div class="col s2">
-      <a v-if="seen" class='dropdown-button btn' href='#' data-activates='loginList'id="choose">请选择登录人员</a>
-      <ul v-if="seen" class="dropdown-content" id="loginList">
-        <login-item v-for="name in names" :name="name"></login-item>
-      </ul>
-
+  <a v-if="seen" class='dropdown-button btn vertical-center' href='#' data-activates='loginList'id="choose">请选择登录人员</a>
+  <ul v-if="seen" class="dropdown-content" id="loginList">
+    <login-item v-for="name in names" :name="name"></login-item>
+  </ul>
+  <div class="row">
+    <div class="col m12 l2">
       <div id = "loginInfo" v-if="seen">
         <p>当前登录的用户是</p>
         <p> {{ name }}</p>
@@ -25,13 +24,13 @@
       </div>
     </div>
 
-    <div id="contact" class="col s3">
+    <div v-if="seen" id="contact" class="col m12 l5">
       <div class>
         <user v-for="item in users" :user="item"></user>
       </div>
     </div>
 
-    <div id="groups" class="col s7">
+    <div v-if="seen" id="groups" class="col m12 l5">
       <group v-for="group in groups" :group="group"></group>
     </div>
   </div>
@@ -46,7 +45,6 @@
   </div>
 
   <div v-if="seen" id="mask">
-
   </div>
 
   <div v-if="seen" id="talk" class="card-panel vertical-center">
