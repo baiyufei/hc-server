@@ -16,6 +16,7 @@ function panelGenerator() {
       call.seen = false;
       talk.seen = true;
       mask.seen = true;
+      talk.target = call.target;
     },
     end: function() {
       talk.seen = false;
@@ -34,9 +35,10 @@ function panelGenerator() {
       callee.seen =false;
       mask.seen = false;
     },
-    call: function() {
+    call: function(uid) {
       callee.seen = true;
       mask.seen = true;
+      callee.target = _users[uid].name;
     },
     groupCall: function(uid) {
       groupCallee.from = _users[uid].name;
@@ -85,7 +87,6 @@ function panelGenerator() {
     template: '<li @click="login"><a> {{ name }}</a></li>',
     methods: { login: function() {
       _fcpClient.nameLogin(this.name);
-
     }}
   });
 
@@ -154,10 +155,11 @@ function panelGenerator() {
     }
   });
 
+  // the card pop-up after calling
   var call = new Vue({
     el: '#call',
     data: {
-      target: {},
+      target: "",   // callee's user name
       seen: false
     },
     methods: {
@@ -165,15 +167,17 @@ function panelGenerator() {
     }
   });
 
+  // the card pop-up after receiving a call
   var callee = new Vue({
     el: '#callee',
     data: {
-      target: {},
+      target: "",   // call's user name
       seen: false
     },
     methods: {
       accept: function() {
         _fcpClient.accept();
+        talk.target = this.target;
       },
       refuse: function() { _fcpClient.refuse(); }
     }
@@ -182,7 +186,7 @@ function panelGenerator() {
   var talk = new Vue({
     el: '#talk',
     data: {
-      target: {},
+      target: "",
       seen: false
     },
     methods: {

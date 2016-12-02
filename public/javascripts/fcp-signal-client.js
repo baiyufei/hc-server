@@ -69,7 +69,7 @@ function fcpSignalClient(address) {
     remoteUid = msg.from;
     state = State.CALL_RING;
     sound.play('ring');
-    if (eventCallback !== undefined) eventCallback.call();
+    if (eventCallback !== undefined) eventCallback.call(remoteUid);
   });
 
 

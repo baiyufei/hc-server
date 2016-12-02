@@ -39,6 +39,7 @@
   <div v-if="seen" id="callee" class="card-panel vertical-center">
 
     <h2>被叫面板</h2>
+    <p>{{ target }}</p>
     <a @click="accept" class="waves-effect waves-light btn green">接听</a>
     <a @click="refuse" class="waves-effect waves-light btn red">拒绝</a>
 
@@ -50,6 +51,7 @@
 
   <div v-if="seen" id="talk" class="card-panel vertical-center">
     <h2>通话面板</h2>
+    <p> {{ target }}</p>
     <a @click="hangup" class="waves-effect waves-light btn red">结束通话</a>
   </div>
 
