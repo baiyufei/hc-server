@@ -1,6 +1,7 @@
 function panelGenerator() {
   var _fcpClient = fcpSignalClient('http://127.0.0.1:3000');
   var _users; // map    uid---user
+  var _loginUid;
   var that = {};
   _fcpClient.setDataCallback(dataCallback);
 
@@ -45,10 +46,11 @@ function panelGenerator() {
     groupCallAddClient: function(uid) {
       groupCall.clients.push(_users[uid].name);
     },
-    loginSuccess: function() {
+    loginSuccess: function(uid) {
       loginList.seen = false;
       loginInfo.seen = true;
       chooseInfo.seen = false;
+      _loginUid = uid;
     }
   };
 
@@ -82,7 +84,7 @@ function panelGenerator() {
     template: '<li @click="login"><a> {{ name }}</a></li>',
     methods: { login: function() {
       _fcpClient.nameLogin(this.name);
-      loginInfo.name = this.name;
+
     }}
   });
 
@@ -103,7 +105,8 @@ function panelGenerator() {
     el: '#loginInfo',
     data: {
       seen: false,
-      name: ""
+      name: "",
+      org: ""
     }
   });
 
@@ -120,11 +123,19 @@ function panelGenerator() {
       loginList.names = data;
     }
     else if (type === "contacts") {
-      contact.users = data;
+
+      // update contacts, filter self
+      contact.users = data.filter(function(item) {return item.uid != _loginUid});
+
+      // update _users
       _users = {};
       for (var i = 0; i < data.length; i++) {
         _users[data[i].uid] = data[i];
       }
+
+      var user = _users[_loginUid];
+      loginInfo.name = user.name;
+      loginInfo.org = user.org;
     }
     else if (type ==="group-info") {
       groups.groups = data;

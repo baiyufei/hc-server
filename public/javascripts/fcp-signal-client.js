@@ -29,7 +29,7 @@ function fcpSignalClient(address) {
       sound.play('login-success');
       console.log("login success! Uid is " + uid);
       if (eventCallback !== undefined) {
-        eventCallback.loginSuccess();
+        eventCallback.loginSuccess(uid);
       }
     } else {
       state = State.NOT_JOINED;
