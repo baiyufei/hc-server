@@ -108,6 +108,7 @@ function fcpSignalClient(address) {
     ioClient.emit('group-call-answer', {'from': uid, 'to': msg.from, 'success': true});
     remoteUid = msg.from;
     state = State.CALL_GROUP_CALLEE;
+    if (eventCallback !== undefined) eventCallback.groupCall(remoteUid);
   });
 
   ioClient.on('group-call-answer', function(msg) {
@@ -116,6 +117,7 @@ function fcpSignalClient(address) {
     }
     gUidList.push(msg.from);
     rtc.groupCallSingle(msg.from);
+    if (eventCallback !== undefined) eventCallback.groupCallAddClient(msg.from);
   });
 
   ioClient.on('group-call-hang-up', function(msg) {
@@ -124,6 +126,7 @@ function fcpSignalClient(address) {
     }
     rtc.hangup();
     state = State.USUAL;
+    if (eventCallback !== undefined) eventCallback.end();
   });
 
   var that = {};

@@ -9,25 +9,41 @@ function panelGenerator() {
     callSuccess: function(uid) {
       call.target = _users[uid].name;
       call.seen = true;
+      mask.seen = true;
     },
     accept: function() {
       call.seen = false;
       talk.seen = true;
+      mask.seen = true;
     },
     end: function() {
       talk.seen = false;
       call.seen = false;
       callee.seen = false;
+      groupCall.seen = false;
+      groupCallee.seen = false;
+      mask.seen = false;
     },
     calleeAccept: function() {
       callee.seen = false;
       talk.seen = true;
+      mask.seen = true;
     },
     calleeRefuse: function() {
       callee.seen =false;
+      mask.seen = false;
     },
     call: function() {
       callee.seen = true;
+      mask.seen = true;
+    },
+    groupCall: function(uid) {
+      groupCallee.from = _users[uid].name;
+      groupCallee.seen = true;
+      mask.seen = true;
+    },
+    groupCallAddClient: function(uid) {
+      groupCall.clients.push(_users[uid].name);
     },
     loginSuccess: function() {
       loginList.seen = false;
@@ -54,6 +70,9 @@ function panelGenerator() {
     methods: {
       groupCall : function() {
         _fcpClient.groupCallId(this.group.id);
+        groupCall.name = this.group.name;
+        groupCall.seen = true;
+        mask.seen = true;
       }
     }
   });
@@ -157,6 +176,35 @@ function panelGenerator() {
     methods: {
       hangup: function() { _fcpClient.hangup();}
     }
+  });
+
+  var groupCall = new Vue({
+    el: '#groupCall',
+    data: {
+      seen: false,
+      name: "",
+      clients: []
+    },
+    methods: {
+      hangup: function() {
+        _fcpClient.hangup();
+        this.seen = false;
+        mask.seen = false;
+      }
+    }
+  });
+
+  var groupCallee = new Vue({
+    el: '#groupCallee',
+    data: {
+      seen: false,
+      from: ""
+    }
+  });
+
+  var mask = new Vue({
+    el: '#mask',
+    data: {seen: false}
   });
 
 
