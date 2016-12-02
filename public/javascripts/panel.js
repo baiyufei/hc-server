@@ -71,6 +71,7 @@ function panelGenerator() {
     template: '<div> {{ group.name }} {{ group.owner }} <div v-for="user in group.member">{{user.name}}</div><a @click="groupCall" class="waves-effect waves-light btn green">群组语音</a></div>',
     methods: {
       groupCall : function() {
+        groupCall.clients = [];
         _fcpClient.groupCallId(this.group.id);
         groupCall.name = this.group.name;
         groupCall.seen = true;
