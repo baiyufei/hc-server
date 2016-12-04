@@ -9,36 +9,42 @@
   <link href="stylesheets/panel.css" rel="stylesheet">
 </head>
 <body>
+<div class="hide-on-small-and-down back">
 
-<main>
-  <a v-if="seen" class='dropdown-button btn vertical-center' href='#' data-activates='loginList'id="choose">请选择登录人员</a>
-  <ul v-if="seen" class="dropdown-content" id="loginList">
-    <login-item v-for="name in names" :name="name"></login-item>
+</div>
+<main class="container ">
+  <a v-if="seen" class='dropdown-button btn vertical-center blue white-text' href='#' data-activates='loginList'id="choose">请选择登录人员</a>
+  <ul v-if="seen" class="dropdown-content " id="loginList">
+    <login-item v-for="name in names"  :name="name"></login-item>
   </ul>
   <div class="row">
-    <div class="col m12 l2">
+    <div class="col s12 m2">
       <div id = "loginInfo" v-if="seen">
-        <p>当前登录的用户是</p>
-        <p> {{ name }}</p>
-        <p> {{ org }}</p>
+        <div class="card-panel hoverable blue center-align white-text my-left ">
+          <img :src="src"/>
+          <h4> {{ name }}</h4>
+          <h5> {{ org }}</h5>
+        </div>
       </div>
     </div>
 
-    <div v-if="seen" id="contact" class="col m12 l5">
-      <div class>
-        <user v-for="item in users" :user="item"></user>
+    <div class="col s12 m4">
+      <div v-if="seen" id="contact">
+        <div class>
+          <user v-for="item in users" :user="item"></user>
+        </div>
       </div>
     </div>
 
-    <div v-if="seen" id="groups" class="col m12 l5">
+
+    <div v-if="seen" id="groups" class="col s12 m4">
       <group v-for="group in groups" :group="group"></group>
     </div>
   </div>
 
-  <div v-if="seen" id="callee" class="card-panel vertical-center">
-
-    <h2>被叫面板</h2>
-    <p>{{ target }}</p>
+  <div v-if="seen" id="callee" class="card-panel vertical-center center-align">
+    <img :src="src" />
+    <p> 来自{{ target }}的电话</p>
     <a @click="accept" class="waves-effect waves-light btn green">接听</a>
     <a @click="refuse" class="waves-effect waves-light btn red">拒绝</a>
 
@@ -47,28 +53,26 @@
   <div v-if="seen" id="mask">
   </div>
 
-  <div v-if="seen" id="talk" class="card-panel vertical-center">
-    <h2>通话面板</h2>
-    <p> {{ target }}</p>
+  <div v-if="seen" id="talk" class="card-panel vertical-center  center-align">
+    <img :src="src" />
+    <p> 正在和{{ target }}通话</p>
     <a @click="hangup" class="waves-effect waves-light btn red">结束通话</a>
   </div>
 
-  <div v-if="seen" id="call" class="card-panel vertical-center">
-    <h2>主叫面板</h2>
+  <div v-if="seen" id="call" class="card-panel vertical-center  center-align">
+    <img :src="src" />
     <p> 正在呼叫 {{ target }} </p>
     <a @click="hangup" class="waves-effect waves-light btn red">挂断</a>
   </div>
 
   <div v-if="seen" id="groupCall" class="card-panel vertical-center">
-    <h2>群组主叫面板</h2>
     <p> 当前小组 {{ name }} </p>
     <p> 当前加入的人 </p>
     <p v-for="client in clients"> {{ client }}</p>
     <a @click="hangup" class="waves-effect waves-light btn red">挂断</a>
   </div>
 
-  <div v-if="seen" id="groupCallee" class="card-panel vertical-center">
-    <h2>群组被叫面板</h2>
+  <div v-if="seen" id="groupCallee" class="card-panel vertical-center  center-align">
     <p> 来自 {{ from }} 的群组广播</p>
   </div>
 </main>

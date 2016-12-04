@@ -1,5 +1,5 @@
 .online {
-    color: green;
+    color: #4caf50;
 }
 
 .offline {
@@ -30,4 +30,55 @@
     position: fixed;
     bottom: 0;
     z-index: 4;
+}
+
+.my-left {
+    margin-top: 50px;
+}
+
+.user-show {
+    height: 100px;
+    max-width: 600px;
+    margin-bottom: 30px;
+    position: relative;
+}
+.user-show img {
+    height: 100px;
+    width: 100px;
+    float: left;
+    margin-right: 20px;
+}
+
+
+.user-show a {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#contact {
+    margin-top: 50px;
+}
+
+#groups {
+    margin-top: 50px;
+}
+
+#loginInfo img {
+    width: 100%;
+}
+
+.back {
+    height: 100%;
+    width: 100%;
+    background: url(../images/1.jpg);
+    position: fixed;
+    z-index: -1;
+    background-size:100%
+
+}
+
+
+#talk img,#call img,#callee img {
+    width: 200px;
 }

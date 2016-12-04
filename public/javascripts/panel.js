@@ -9,6 +9,7 @@ function panelGenerator() {
   var eventCallback = {
     callSuccess: function(uid) {
       call.target = _users[uid].name;
+      call.src = 'images/' + uid + '.jpg';
       call.seen = true;
       mask.seen = true;
     },
@@ -17,6 +18,7 @@ function panelGenerator() {
       talk.seen = true;
       mask.seen = true;
       talk.target = call.target;
+      talk.src = call.src;
     },
     end: function() {
       talk.seen = false;
@@ -39,6 +41,7 @@ function panelGenerator() {
       callee.seen = true;
       mask.seen = true;
       callee.target = _users[uid].name;
+      callee.src = 'images/' + uid + '.jpg';
     },
     groupCall: function(uid) {
       groupCallee.from = _users[uid].name;
@@ -50,9 +53,10 @@ function panelGenerator() {
     },
     loginSuccess: function(uid) {
       loginList.seen = false;
-      loginInfo.seen = true;
       chooseInfo.seen = false;
       _loginUid = uid;
+      loginInfo.src = 'images/' + uid + '.jpg';
+      loginInfo.seen = true;
     }
   };
 
@@ -60,7 +64,7 @@ function panelGenerator() {
 
   Vue.component('user', {
     props: ['user'],
-    template: '<div class="row"><div class="col s12"><div class="card-panel hoverable grey"><div class="row"><div class="col s8"><div>{{ user.name }}</div><div>{{ user.org }}</div></div><div class="col s4"><a @click="call" class="waves-effect waves-light btn green">call</a></div></div> </div></div></div> ',
+    template: '<div style="display: block" class="blue user-show hoverable white-text waves-effect waves-light" @click="call" :class="{\'lighten-4\': !user.online}"><img :src="user.src"><h4>{{ user.name }}</h4> <h5>{{ user.org }}</h5></div>',
     methods: {
       call: function() {
         _fcpClient.callUid(this.user.uid);
@@ -70,7 +74,7 @@ function panelGenerator() {
 
   Vue.component('group', {
     props: ['group'],
-    template: '<div> {{ group.name }} {{ group.owner }} <div v-for="user in group.member">{{user.name}}</div><a @click="groupCall" class="waves-effect waves-light btn green">群组语音</a></div>',
+    template: '<div style="display: block" @click="groupCall" class="card-panel grey lighten-1 hoverable waves-effect">{{ group.name }} <span class="manager"> 管理员：</span>{{ group.owner }} <div><span v-for="user in group.member" :class="{online: user.online}">{{user.name}} </span></div></div>',
     methods: {
       groupCall : function() {
         groupCall.clients = [];
@@ -84,7 +88,7 @@ function panelGenerator() {
 
   Vue.component('loginItem', {
     props: ['name'],
-    template: '<li @click="login"><a> {{ name }}</a></li>',
+    template: '<li @click="login"><a class="blue-text text-darken-2"> {{ name }}</a></li>',
     methods: { login: function() {
       _fcpClient.nameLogin(this.name);
     }}
@@ -108,7 +112,8 @@ function panelGenerator() {
     data: {
       seen: false,
       name: "",
-      org: ""
+      org: "",
+      src: ""
     }
   });
 
@@ -131,6 +136,7 @@ function panelGenerator() {
 
       // update contacts, filter self
       contact.users = data.filter(function(item) {return item.uid != _loginUid});
+      contact.users.forEach(function(item) {item.src = 'images/' + item.uid + '.jpg'});
 
       // update _users
       _users = {};
@@ -164,7 +170,8 @@ function panelGenerator() {
     el: '#call',
     data: {
       target: "",   // callee's user name
-      seen: false
+      seen: false,
+      src: ""
     },
     methods: {
       hangup: function() { _fcpClient.hangup(); }
@@ -176,12 +183,14 @@ function panelGenerator() {
     el: '#callee',
     data: {
       target: "",   // call's user name
+      src: "",
       seen: false
     },
     methods: {
       accept: function() {
         _fcpClient.accept();
         talk.target = this.target;
+        talk.src = this.src;
       },
       refuse: function() { _fcpClient.refuse(); }
     }
@@ -192,7 +201,8 @@ function panelGenerator() {
     el: '#talk',
     data: {
       target: "",
-      seen: false
+      seen: false,
+      src: ""
     },
     methods: {
       hangup: function() { _fcpClient.hangup();}
@@ -229,6 +239,8 @@ function panelGenerator() {
     el: '#mask',
     data: {seen: false}
   });
+
+
 
 
 
