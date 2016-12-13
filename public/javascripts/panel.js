@@ -1,5 +1,5 @@
 function panelGenerator() {
-  var _fcpClient = fcpSignalClient('http://127.0.0.1:3000');
+  var _fcpClient = fcpSignalClient(ServerAddress);
   var _users; // map    uid---user
   var _loginUid;
   var that = {};
@@ -9,7 +9,7 @@ function panelGenerator() {
   var eventCallback = {
     callSuccess: function(uid) {
       call.target = _users[uid].name;
-      call.src = 'images/' + uid + '.jpg';
+      call.src = ServerAddress + '/images/' + uid + '.jpg';
       call.seen = true;
       mask.seen = true;
     },
@@ -41,7 +41,7 @@ function panelGenerator() {
       callee.seen = true;
       mask.seen = true;
       callee.target = _users[uid].name;
-      callee.src = 'images/' + uid + '.jpg';
+      callee.src = ServerAddress + '/images/' + uid + '.jpg';
     },
     groupCall: function(uid) {
       groupCallee.from = _users[uid].name;
@@ -55,7 +55,7 @@ function panelGenerator() {
       loginList.seen = false;
       chooseInfo.seen = false;
       _loginUid = uid;
-      loginInfo.src = 'images/' + uid + '.jpg';
+      loginInfo.src = ServerAddress + '/images/' + uid + '.jpg';
       loginInfo.seen = true;
     }
   };
@@ -136,7 +136,7 @@ function panelGenerator() {
 
       // update contacts, filter self
       contact.users = data.filter(function(item) {return item.uid != _loginUid});
-      contact.users.forEach(function(item) {item.src = 'images/' + item.uid + '.jpg'});
+      contact.users.forEach(function(item) {item.src = ServerAddress + '/images/' + item.uid + '.jpg'});
 
       // update _users
       _users = {};
