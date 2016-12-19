@@ -88,8 +88,10 @@ function fcpSignalClient(address) {
       sound.stop();
       state = State.CALL_CONNECTED;
       remoteUid = msg.from;
-      rtc.call(msg.from);
-      if (eventCallback !== undefined) eventCallback.accept();
+      rtc.prepareRecorder(function() {
+        rtc.call(msg.from);
+        if (eventCallback !== undefined) eventCallback.accept();
+      });
     }
   });
 
@@ -163,8 +165,10 @@ function fcpSignalClient(address) {
     if (state !== State.CALL_RING) return;
     state = State.CALL_CONNECTED;
     sound.stop();
-    ioClient.emit('reply', {'result': 'accept', 'from': uid, 'to': remoteUid});
-    if (eventCallback !== undefined) eventCallback.calleeAccept();
+    rtc.prepareRecorder(function() {
+      ioClient.emit('reply', {'result': 'accept', 'from': uid, 'to': remoteUid});
+      if (eventCallback !== undefined) eventCallback.calleeAccept();
+    });
   };
 
   that.refuse = function() {
@@ -181,7 +185,9 @@ function fcpSignalClient(address) {
     if (state !== State.USUAL)
       return;
     state = State.CALL_GROUP_CALL;
-    ioClient.emit('group-call', {'from': uid, 'index': index});
+    rtc.prepareRecorder(function() {
+      ioClient.emit('group-call', {'from': uid, 'index': index});
+    });
   };
 
   // group call by using target group id
@@ -189,20 +195,25 @@ function fcpSignalClient(address) {
     if (state !== State.USUAL)
       return;
     state = State.CALL_GROUP_CALL;
-    ioClient.emit('group-call-id', {'from': uid, 'id': id});
+    rtc.prepareRecorder(function() {
+      ioClient.emit('group-call-id', {'from': uid, 'id': id});
+    });
   };
 
   that.hangup = function() {
     if (state === State.CALL_WAIT || state === State.CALL_CONNECTED) {
-      rtc.hangup();
       sound.play("hangup");
+      sound.stop();
+      rtc.hangup();
+
       state = State.USUAL;
       ioClient.emit('hang-up', {'from': uid, 'to': remoteUid});
       if (eventCallback !== undefined) eventCallback.end();
     }
     else if (state === State.CALL_GROUP_CALL) {
-      rtc.hangup();
       sound.play("hangup");
+      sound.stop();
+      rtc.hangup();
 
       for (var i = 0; i < gUidList.length; i++) {
         var to = gUidList[i];

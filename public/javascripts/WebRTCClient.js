@@ -9,20 +9,6 @@ function webRTCClient(ioWebRTC) {
   var audio = document.getElementById('audio');
   var localStream;  // recorder stream
 
-  navigator.mediaDevices.getUserMedia({audio: true, video: false}).
-    then(function(stream) {
-      localStream = stream;
-      var audioTracks = localStream.getAudioTracks();
-      if (audioTracks.length > 0) {
-        trace('Using Audio device: ' + audioTracks[0].label);
-      }
-    }).
-    catch(function(e) {
-      alert('getUserMedia() error: ' + e.name);
-    });
-
-
-
   var mode; // 'single' or 'group'
 
   var offerOptions = {
@@ -72,8 +58,31 @@ function webRTCClient(ioWebRTC) {
         pcList[i].close();
         pcList[i] = null;
       }
+      if (localStream != null && localStream != undefined) {
+        localStream.getAudioTracks()[0].stop();
+        localStream = null;
+      }
       pcList = [];
       pcMap = {};
+    },
+    /**
+     * waiting for authority and set recorder stream to localStream
+     * then execute next()
+     * @param next
+     */
+    prepareRecorder: function(next) {
+      navigator.mediaDevices.getUserMedia({audio: true, video: false}).
+      then(function(stream) {
+        localStream = stream;
+        var audioTracks = localStream.getAudioTracks();
+        if (audioTracks.length > 0) {
+          trace('Using Audio device: ' + audioTracks[0].label);
+        }
+        next();
+      }).
+      catch(function(e) {
+        alert('getUserMedia() error: ' + e.name);
+      });
     }
   };
 
@@ -166,16 +175,16 @@ function webRTCClient(ioWebRTC) {
     if (msg.mode === 'single') {
       pc.addStream(localStream);
     }
-
     pc.setRemoteDescription(msg.desc).then(
         function() {
           pc.createAnswer().then(
-            pc.extendedFunc.answerDescription,
-            onCreateSessionDescriptionError
+              pc.extendedFunc.answerDescription,
+              onCreateSessionDescriptionError
           );
         },
         onSetSessionDescriptionError
-      );
+    );
+
   });
 
   ioWebRTC.on('answer_desc', function(msg) {
@@ -191,6 +200,7 @@ function webRTCClient(ioWebRTC) {
 
   ioWebRTC.on('ice', function (msg) {
     var pc = pcMap[msg.from];
+    console.log(msg.candidate);
     pc.addIceCandidate(
       new RTCIceCandidate(msg.candidate)
     ).then(
