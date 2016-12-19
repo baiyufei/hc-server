@@ -278,6 +278,7 @@ function fcpSignal(io) {
     socket.on('disconnect', function () {
       delete uidMap[socket.uid];
       logger.info('user ' + socket.uid + ' leaves');
+      updatePanel();
     });
 
   });
