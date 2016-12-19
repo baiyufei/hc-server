@@ -20,8 +20,8 @@ function fcpSound() {
   return {
     'play': function(name) {
       if (audioNow !== null) {
-        audioNow.pause();
         audioNow.currentTime = 0;
+        audioNow.pause();
       }
       audioNow = audios[name];
       if (audioNow !== undefined) {
@@ -30,8 +30,8 @@ function fcpSound() {
     },
     'stop': function() {
       if (audioNow !== null) {
-        audioNow.pause();
         audioNow.currentTime = 0;
+        audioNow.pause();
         audioNow = null;
       }
     }
